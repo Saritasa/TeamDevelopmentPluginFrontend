@@ -1,8 +1,8 @@
 <idea-plugin>
-  <id>com.saritasa.teamDevelopment</id>
-  <name>Team Development</name>
-  <version>0.1.0</version>
-  <vendor email="v.berdnik@saritasa.com" url="http://www.saritasa.com">Saritasa</vendor>
+    <id>com.saritasa.teamDevelopment</id>
+    <name>Team Development</name>
+    <version>0.2.2</version>
+    <vendor email="v.berdnik@saritasa.com" url="http://www.saritasa.com">Saritasa</vendor>
 
   <description><![CDATA[
       Plugin that can help during team development of the project.<br>
@@ -13,26 +13,17 @@
     ]]>
   </change-notes>
 
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-  <idea-version since-build="180.0"/>
+    <idea-version since-build="173.0"/>
 
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-       on how to target different products -->
-  <!-- uncomment to enable plugin in all products
-  <depends>com.intellij.modules.lang</depends>
-  -->
+    <depends>com.intellij.modules.lang</depends>
 
-  <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
-  </extensions>
-
-  <actions>
-    <!-- Add your actions here -->
-    <action id="CheckCurrentFile" class="com.saritasa.teamDevelopment.CheckCurrentFileAction"
-            text="Check this file for team development..."
-            description="Checks whether this file is edited by another development or not">
-      <add-to-group group-id="ToolsMenu" anchor="last"/>
-    </action>
-  </actions>
+    <actions>
+        <!-- Add your actions here -->
+        <action id="CheckCurrentFile" class="com.saritasa.teamDevelopment.CheckCurrentFileAction"
+                text="Check file for team development..."
+                description="Checks whether this file is edited by another developer or not">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+    </actions>
 
 </idea-plugin>
