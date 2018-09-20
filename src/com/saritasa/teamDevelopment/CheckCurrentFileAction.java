@@ -1,61 +1,30 @@
 package com.saritasa.teamDevelopment;
 
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationDisplayType;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ProjectFileIndex;
-import com.intellij.openapi.vfs.VfsUtilCore;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
-import org.apache.commons.codec.digest.DigestUtils;
+import com.saritasa.teamDevelopment.common.NotificationsManager;
+import com.saritasa.teamDevelopment.common.ProjectEnvironment;
+import com.saritasa.teamDevelopment.common.exceptions.PluginException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CheckCurrentFileAction extends AnAction {
 
-    /**
-     * Returns relative path of the given file.
-     *
-     * @param project Project to get relative path to
-     * @param file    File to get relative path for
-     * @return Relative path to file or null when path can not be retrieved
-     */
-    @Nullable
-    private String getFileRelativePath(Project project, VirtualFile file) {
-        VirtualFile contentRootForFile = ProjectFileIndex.SERVICE.getInstance(project).getContentRootForFile(file);
+    private final NotificationsManager notificationManager;
+    private final ProjectEnvironment projectEnvironment;
+    private final FileRevisionsService fileRevisionsService;
 
-        if (contentRootForFile == null) {
-            return null;
-        }
-
-        return VfsUtilCore.getRelativePath(file, contentRootForFile);
-    }
-
-    /**
-     * Displays notification.
-     *
-     * @param title Notification title
-     * @param body  Notification body
-     */
-    private void notify(String title, String body) {
-        Notifications.Bus.register(Notifications.SYSTEM_MESSAGES_GROUP_ID, NotificationDisplayType.BALLOON);
-        Notification notification = new Notification(
-                Notifications.SYSTEM_MESSAGES_GROUP_ID,
-                title,
-                body,
-                NotificationType.INFORMATION
-        );
-
-        Notifications.Bus.notify(notification);
+    public CheckCurrentFileAction() {
+        super();
+        this.notificationManager = new NotificationsManager();
+        this.fileRevisionsService = new FileRevisionsService();
+        this.projectEnvironment = new ProjectEnvironment();
     }
 
     /**
@@ -72,24 +41,40 @@ public class CheckCurrentFileAction extends AnAction {
     }
 
     @Override
+    public void update(AnActionEvent e) {
+        boolean actionEnabled = this.actionEnabled(e);
+        e.getPresentation().setEnabled(actionEnabled);
+    }
+
+    @Override
     public void actionPerformed(AnActionEvent e) {
         if (!this.actionEnabled(e)) {
             return;
         }
 
-        PsiFile psiFile = e.getData(LangDataKeys.PSI_FILE);
-        String fileContent = Objects.requireNonNull(psiFile).getText();
-        String contentHash = DigestUtils.md5Hex(fileContent);
+        try {
+            PsiFile psiFile = e.getData(LangDataKeys.PSI_FILE);
 
-        String filePath = this.getFileRelativePath(e.getProject(), psiFile.getVirtualFile());
-        String pathHash = DigestUtils.md5Hex(filePath);
+            List<FileRevisionData> revisionsList = this.fileRevisionsService.registerNewRevision(psiFile);
 
-        this.notify(pathHash, contentHash);
-    }
+            List<String> sameFileDevelopers = new ArrayList<>();
 
-    @Override
-    public void update(AnActionEvent e) {
-        boolean actionEnabled = this.actionEnabled(e);
-        e.getPresentation().setEnabled(actionEnabled);
+            for (FileRevisionData fileRevisionData : revisionsList) {
+                if (fileRevisionData.getDeveloperName().equals(this.projectEnvironment.getDeveloperName())) {
+                    continue;
+                }
+                sameFileDevelopers.add(fileRevisionData.getDeveloperName());
+            }
+
+            String checkResult = "This file not edited by other developers";
+
+            if (!sameFileDevelopers.isEmpty()) {
+                checkResult = String.join(" ,", sameFileDevelopers);
+            }
+
+            this.notificationManager.information("Existing revisions:", checkResult);
+        } catch (PluginException exception) {
+            this.notificationManager.warning("Team Development Plugin", exception.getMessage());
+        }
     }
 }

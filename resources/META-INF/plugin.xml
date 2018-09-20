@@ -4,13 +4,24 @@
     <version>0.2.2</version>
     <vendor email="v.berdnik@saritasa.com" url="http://www.saritasa.com">Saritasa</vendor>
 
-  <description><![CDATA[
+    <description><![CDATA[
       Plugin that can help during team development of the project.<br>
     ]]></description>
 
-  <change-notes><![CDATA[
-      0.1.0 Plugin init
-    ]]>
+    <change-notes><![CDATA[
+        <p><h3>0.2.0</h3>
+        <ul>
+            <li>Implement basic functionality to check current file for editing by another developer</li>
+            <li>Allow to install plugin on all JetBrains products</li>
+        </ul>
+        </p>
+        <p>
+        <h3>0.1.0</h3>
+        <ul>
+            <li>Plugin init</li>
+        </ul>
+        </p>
+        ]]>
   </change-notes>
 
     <idea-version since-build="173.0"/>
