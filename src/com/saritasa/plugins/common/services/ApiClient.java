@@ -1,7 +1,7 @@
-package com.saritasa.teamDevelopment.common;
+package com.saritasa.plugins.common.services;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.saritasa.teamDevelopment.common.exceptions.PluginException;
+import com.saritasa.plugins.common.exceptions.PluginException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;

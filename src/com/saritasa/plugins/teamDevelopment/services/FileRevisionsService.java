@@ -1,13 +1,16 @@
-package com.saritasa.teamDevelopment;
+package com.saritasa.plugins.teamDevelopment.services;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.psi.PsiFile;
-import com.saritasa.teamDevelopment.common.ApiClient;
-import com.saritasa.teamDevelopment.common.ProjectEnvironment;
-import com.saritasa.teamDevelopment.common.exceptions.PluginException;
+import com.saritasa.plugins.common.exceptions.PluginException;
+import com.saritasa.plugins.common.services.ApiClient;
+import com.saritasa.plugins.common.services.ProjectEnvironmentService;
+import com.saritasa.plugins.teamDevelopment.dto.FileRevisionData;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jetbrains.annotations.NotNull;
-import org.json.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,17 +19,16 @@ import java.util.Objects;
 /**
  * File revisions service. Can register new revision of project file in team development service.
  */
-class FileRevisionsService {
+public class FileRevisionsService {
 
-    private final ApiClient apiClient;
-    private final ProjectEnvironment projectEnvironment;
-
-    FileRevisionsService() {
-        this.apiClient = new ApiClient();
-        this.projectEnvironment = new ProjectEnvironment();
-    }
-
-    private List<FileRevisionData> parseFileRevisions(String response) throws PluginException {
+    /**
+     * Parses API response into list of file revisions.
+     *
+     * @param response String response from remote service.
+     * @return List of file revisions
+     * @throws PluginException When response has not a valid format
+     */
+    private List<FileRevisionData> parseFileRevisionsResponse(String response) throws PluginException {
         try {
             JSONObject jsonObject = new JSONObject(response);
             JSONArray revisionsArray = jsonObject.getJSONArray("results");
@@ -45,7 +47,7 @@ class FileRevisionsService {
 
             return revisionsList;
         } catch (Throwable e) {
-            throw new PluginException("Can't parse revisoins response: " + e.getMessage());
+            throw new PluginException("Can't parse revisions response: " + e.getMessage());
         }
     }
 
@@ -57,14 +59,15 @@ class FileRevisionsService {
      * @throws PluginException When developer name not retrieved
      */
     @NotNull
-    private FileRevisionData getFileRevisionData(PsiFile psiFile) throws PluginException {
+    private FileRevisionData getFileRevisionData(@NotNull PsiFile psiFile) throws PluginException {
+        ProjectEnvironmentService projectEnvironmentService = ServiceManager.getService(psiFile.getProject(), ProjectEnvironmentService.class);
         String fileContent = Objects.requireNonNull(psiFile).getText();
         String contentHash = DigestUtils.md5Hex(fileContent);
 
-        String filePath = this.projectEnvironment.getFileRelativePath(psiFile);
+        String filePath = projectEnvironmentService.getFileRelativePath(psiFile);
         String pathHash = DigestUtils.md5Hex(filePath);
 
-        String developerName = this.projectEnvironment.getDeveloperName();
+        String developerName = projectEnvironmentService.getDeveloperName();
 
         String projectName = Objects.requireNonNull(psiFile.getProject()).getName();
         return new FileRevisionData(projectName, pathHash, contentHash, developerName);
@@ -77,14 +80,15 @@ class FileRevisionsService {
      * @return List of revisions of this file from other developers
      * @throws PluginException In case of server communication error
      */
-    List<FileRevisionData> registerNewRevision(PsiFile psiFile) throws PluginException {
+    public List<FileRevisionData> registerNewRevision(PsiFile psiFile) throws PluginException {
+        ApiClient apiClient = ServiceManager.getService(psiFile.getProject(), ApiClient.class);
 
         FileRevisionData fileRevision = this.getFileRevisionData(psiFile);
 
         ObjectNode editedFileData = fileRevision.toObjectNode();
 
-        String response = this.apiClient.post("revisions", editedFileData);
+        String response = apiClient.post("revisions", editedFileData);
 
-        return this.parseFileRevisions(response);
+        return this.parseFileRevisionsResponse(response);
     }
 }

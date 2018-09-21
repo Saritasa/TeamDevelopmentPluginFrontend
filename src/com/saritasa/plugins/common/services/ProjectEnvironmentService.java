@@ -1,10 +1,10 @@
-package com.saritasa.teamDevelopment.common;
+package com.saritasa.plugins.common.services;
 
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
-import com.saritasa.teamDevelopment.common.exceptions.PluginException;
+import com.saritasa.plugins.common.exceptions.PluginException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +15,7 @@ import java.io.InputStreamReader;
 /**
  * Project environment helper. Allows to retrieve developer name and relative path to files.
  */
-public class ProjectEnvironment {
+public class ProjectEnvironmentService {
     /**
      * Cached retrieved user name property.
      */

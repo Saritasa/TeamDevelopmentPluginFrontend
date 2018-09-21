@@ -1,5 +1,5 @@
 <idea-plugin>
-    <id>com.saritasa.teamDevelopment</id>
+    <id>com.saritasa.plugins.teamDevelopment</id>
     <name>Team Development</name>
     <version>0.2.2</version>
     <vendor email="v.berdnik@saritasa.com" url="http://www.saritasa.com">Saritasa</vendor>
@@ -28,9 +28,24 @@
 
     <depends>com.intellij.modules.lang</depends>
 
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceInterface="com.saritasa.plugins.common.services.NotificationsService"
+                            serviceImplementation="com.saritasa.plugins.common.services.NotificationsService">
+        </applicationService>
+        <projectService serviceInterface="com.saritasa.plugins.common.services.ProjectEnvironmentService"
+                            serviceImplementation="com.saritasa.plugins.common.services.ProjectEnvironmentService">
+        </projectService>
+        <projectService serviceInterface="com.saritasa.plugins.common.services.ApiClient"
+                            serviceImplementation="com.saritasa.plugins.common.services.ApiClient">
+        </projectService>
+        <projectService serviceInterface="com.saritasa.plugins.teamDevelopment.services.FileRevisionsService"
+                            serviceImplementation="com.saritasa.plugins.teamDevelopment.services.FileRevisionsService">
+        </projectService>
+    </extensions>
+
     <actions>
         <!-- Add your actions here -->
-        <action id="CheckCurrentFile" class="com.saritasa.teamDevelopment.CheckCurrentFileAction"
+        <action id="CheckCurrentFile" class="com.saritasa.plugins.teamDevelopment.CheckCurrentFileAction"
                 text="Check file for team development..."
                 description="Checks whether this file is edited by another developer or not">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
