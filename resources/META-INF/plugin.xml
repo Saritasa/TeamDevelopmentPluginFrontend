@@ -1,27 +1,14 @@
 <idea-plugin>
     <id>com.saritasa.plugins.teamDevelopment</id>
     <name>Team Development</name>
-    <version>0.2.2</version>
+    <version>0.3.1</version>
     <vendor email="v.berdnik@saritasa.com" url="http://www.saritasa.com">Saritasa</vendor>
 
     <description><![CDATA[
       Plugin that can help during team development of the project.<br>
     ]]></description>
 
-    <change-notes><![CDATA[
-        <p><h3>0.2.0</h3>
-        <ul>
-            <li>Implement basic functionality to check current file for editing by another developer</li>
-            <li>Allow to install plugin on all JetBrains products</li>
-        </ul>
-        </p>
-        <p>
-        <h3>0.1.0</h3>
-        <ul>
-            <li>Plugin init</li>
-        </ul>
-        </p>
-        ]]>
+    <change-notes><![CDATA[]]>
   </change-notes>
 
     <idea-version since-build="173.0"/>
@@ -29,23 +16,25 @@
     <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceInterface="com.saritasa.plugins.common.services.NotificationsService"
-                            serviceImplementation="com.saritasa.plugins.common.services.NotificationsService">
-        </applicationService>
-        <projectService serviceInterface="com.saritasa.plugins.common.services.ProjectEnvironmentService"
-                            serviceImplementation="com.saritasa.plugins.common.services.ProjectEnvironmentService">
-        </projectService>
-        <projectService serviceInterface="com.saritasa.plugins.common.services.ApiClient"
-                            serviceImplementation="com.saritasa.plugins.common.services.ApiClient">
-        </projectService>
-        <projectService serviceInterface="com.saritasa.plugins.teamDevelopment.services.FileRevisionsService"
-                            serviceImplementation="com.saritasa.plugins.teamDevelopment.services.FileRevisionsService">
-        </projectService>
+        <!--Application level services-->
+        <applicationService serviceImplementation="com.saritasa.plugins.common.services.NotificationsService"/>
+        <applicationService serviceImplementation="com.saritasa.plugins.common.services.ApiClient"/>
+        <applicationService serviceImplementation="com.saritasa.plugins.teamDevelopment.TeamDevelopmentSettings"/>
+
+        <!--Project level services-->
+        <projectService serviceImplementation="com.saritasa.plugins.common.services.ProjectEnvironmentService"/>
+        <projectService serviceImplementation="com.saritasa.plugins.teamDevelopment.services.FileRevisionsService"/>
+        <projectService serviceImplementation="com.saritasa.plugins.teamDevelopment.TeamDevelopmentPlugin"/>
+
+        <!--Plugin settings form-->
+        <applicationConfigurable groupId="tools"
+                                 displayName="Team Development"
+                                 id="preferences.teamDevelopmentPlugin"
+                                 instance="com.saritasa.plugins.teamDevelopment.settings.PluginSettingsHandler"/>
     </extensions>
 
     <actions>
-        <!-- Add your actions here -->
-        <action id="CheckCurrentFile" class="com.saritasa.plugins.teamDevelopment.CheckCurrentFileAction"
+        <action id="CheckCurrentFile" class="com.saritasa.plugins.teamDevelopment.actions.CheckCurrentFileAction"
                 text="Check file for team development..."
                 description="Checks whether this file is edited by another developer or not">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>

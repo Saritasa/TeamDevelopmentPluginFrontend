@@ -1,5 +1,6 @@
 package com.saritasa.plugins.common.services;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -20,6 +21,12 @@ public class ProjectEnvironmentService {
      * Cached retrieved user name property.
      */
     private static String userName = "";
+
+    private Project project;
+
+    public ProjectEnvironmentService(Project project) {
+        this.project = project;
+    }
 
     /**
      * Allows to retrieve user name of current project.
@@ -66,7 +73,7 @@ public class ProjectEnvironmentService {
      */
     @Nullable
     public String getFileRelativePath(@NotNull PsiFile psiFile) {
-        VirtualFile contentRootForFile = ProjectFileIndex.SERVICE.getInstance(psiFile.getProject())
+        VirtualFile contentRootForFile = ProjectFileIndex.SERVICE.getInstance(this.project)
                 .getContentRootForFile(psiFile.getVirtualFile());
 
         if (contentRootForFile == null) {

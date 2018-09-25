@@ -2,6 +2,7 @@ package com.saritasa.plugins.teamDevelopment.services;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.saritasa.plugins.common.exceptions.PluginException;
 import com.saritasa.plugins.common.services.ApiClient;
@@ -20,6 +21,12 @@ import java.util.Objects;
  * File revisions service. Can register new revision of project file in team development service.
  */
 public class FileRevisionsService {
+
+    private Project project;
+
+    public FileRevisionsService(Project project) {
+        this.project = project;
+    }
 
     /**
      * Parses API response into list of file revisions.
@@ -60,7 +67,7 @@ public class FileRevisionsService {
      */
     @NotNull
     private FileRevisionData getFileRevisionData(@NotNull PsiFile psiFile) throws PluginException {
-        ProjectEnvironmentService projectEnvironmentService = ServiceManager.getService(psiFile.getProject(), ProjectEnvironmentService.class);
+        ProjectEnvironmentService projectEnvironmentService = ServiceManager.getService(this.project, ProjectEnvironmentService.class);
         String fileContent = Objects.requireNonNull(psiFile).getText();
         String contentHash = DigestUtils.md5Hex(fileContent);
 
@@ -69,7 +76,7 @@ public class FileRevisionsService {
 
         String developerName = projectEnvironmentService.getDeveloperName();
 
-        String projectName = Objects.requireNonNull(psiFile.getProject()).getName();
+        String projectName = this.project.getName();
         return new FileRevisionData(projectName, pathHash, contentHash, developerName);
     }
 
@@ -81,7 +88,7 @@ public class FileRevisionsService {
      * @throws PluginException In case of server communication error
      */
     public List<FileRevisionData> registerNewRevision(PsiFile psiFile) throws PluginException {
-        ApiClient apiClient = ServiceManager.getService(psiFile.getProject(), ApiClient.class);
+        ApiClient apiClient = ServiceManager.getService(ApiClient.class);
 
         FileRevisionData fileRevision = this.getFileRevisionData(psiFile);
 
