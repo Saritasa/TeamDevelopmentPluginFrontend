@@ -38,7 +38,7 @@ public class ProjectEnvironmentService {
     public String getDeveloperName() throws PluginException {
         if (userName.isEmpty()) {
             String contentRoot = getProjectPath().getPath();
-            String command = "git -C '" + contentRoot + "' config user.name";
+            String command = "git -C " + contentRoot + " config user.name";
             try {
                 Process process = Runtime.getRuntime().exec(command);
                 if (process.waitFor() != 0) {
