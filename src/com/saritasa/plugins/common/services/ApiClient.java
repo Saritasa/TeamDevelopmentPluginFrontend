@@ -16,6 +16,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -23,6 +24,9 @@ import java.io.IOException;
  * Team Development service API client.
  */
 public class ApiClient {
+    private static final String PING_RESPONSE_ATTRIBUTE = "message";
+    private static final String PING_RESPONSE_MESSAGE = "pong";
+
     /**
      * Returns validated API url root.
      *
@@ -94,10 +98,12 @@ public class ApiClient {
      */
     public void ping(String apiUrl) throws PluginException {
         apiUrl = this.getValidApiUrl(apiUrl);
-        // TODO improve with this.get()
+        // TODO improve with this.get(endpoint, parameters)
         HttpGet httpGet = new HttpGet(apiUrl.concat("ping"));
         String response = this.doRequest(httpGet);
-        if (!response.equals("[\"pong\"]")) {
+        JSONObject json = new JSONObject(response);
+
+        if (!json.has(PING_RESPONSE_ATTRIBUTE) || !json.getString(PING_RESPONSE_ATTRIBUTE).equals(PING_RESPONSE_MESSAGE)) {
             throw new PluginException("Invalid API ping response");
         }
     }
