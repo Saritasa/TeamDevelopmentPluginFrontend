@@ -3,7 +3,7 @@ package com.saritasa.plugins.common.services;
 import com.intellij.notification.*;
 
 /**
- * Notification manager. Can display popup notifications with different critical levels to user.
+ * Notification manager. Can display popup notifications with different importance levels to user.
  */
 public class NotificationsService {
 

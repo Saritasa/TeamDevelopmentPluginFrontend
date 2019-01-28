@@ -40,6 +40,7 @@ public class TeamDevelopmentPlugin {
             List<String> sameFileDevelopers = new ArrayList<>();
 
             for (FileRevisionData fileRevisionData : revisionsList) {
+                // No need to notify about developer's own revisions
                 if (fileRevisionData.getDeveloperName().equals(projectEnvironmentService.getDeveloperName())) {
                     continue;
                 }
