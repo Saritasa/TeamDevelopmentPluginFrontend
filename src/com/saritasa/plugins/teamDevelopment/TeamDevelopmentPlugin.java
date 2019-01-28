@@ -65,7 +65,7 @@ public class TeamDevelopmentPlugin {
                 };
             }
 
-            notificationsService.information("Existing revisions:", checkResult, notificationListener);
+            notificationsService.information("Existing revisions", checkResult, notificationListener);
         } catch (PluginException exception) {
             notificationsService.warning("Team Development Plugin", exception.getMessage());
         }
