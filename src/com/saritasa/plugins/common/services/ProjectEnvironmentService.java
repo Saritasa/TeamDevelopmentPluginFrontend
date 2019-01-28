@@ -1,6 +1,8 @@
 package com.saritasa.plugins.common.services;
 
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -35,7 +37,8 @@ public class ProjectEnvironmentService {
      */
     public String getDeveloperName() throws PluginException {
         if (userName.isEmpty()) {
-            String command = "git config user.name";
+            String contentRoot = getProjectPath().getPath();
+            String command = "git -C '" + contentRoot + "' config user.name";
             try {
                 Process process = Runtime.getRuntime().exec(command);
                 if (process.waitFor() != 0) {
@@ -63,6 +66,13 @@ public class ProjectEnvironmentService {
         }
 
         return userName;
+    }
+
+    /**
+     * Returns virtual file of project root.
+     */
+    private VirtualFile getProjectPath() {
+        return ModuleRootManager.getInstance(ModuleManager.getInstance(project).getModules()[0]).getContentRoots()[0];
     }
 
     /**
